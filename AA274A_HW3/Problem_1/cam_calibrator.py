@@ -105,10 +105,14 @@ class CameraCalibrator:
         HINT: You MAY find the function np.meshgrid() useful.
         """
         ########## Code starts here ##########
+        # Pick top left as origin
+        d = 20.5
+        x = np.arange(start=d, stop=d*10, step=d)
+        y = np.arange(start=d, stop=d*8, step=d)
 
+        Xg, Yg = np.meshgrid(x,y)
 
-
-
+        corner_coordinates = (Xg, Yg)
         ########## Code ends here ##########
         return corner_coordinates
 
@@ -127,11 +131,22 @@ class CameraCalibrator:
         HINT: Some numpy functions that might come in handy are stack, vstack, hstack, column_stack, expand_dims, zeros_like, and ones_like.
         """
         ########## Code starts here ##########
+        # Prep work
+        zeros_mat = np.zeros_like(M_bar)
 
+        # Get initial guess
+        L = np.array([[np.transpose(M_bar), np.transpose(zero_mat), -u*np.transpose(M_bar)],
+                      [np.transpose(zeros_mat), np.transpose(M_bar), -v*np.transpose(M_bar)]])
+        u, s, _ = np.linalg.svd(L) # is this the right equation
 
+        x = u[np.argmin(s), :] # check the dimensions
 
+        m_hat_0 = 1 / (np.transpose(x[2])@M) * np.array([[np.transpose(x[0])@M], [np.transpose(x[1])@M]])
 
+        # Develop function
 
+        # Levenberg Marquardt Algorithm
+        res = scipy.optimize.least_squares(func, x0=m_hat_0, method="lm")
 
         ########## Code ends here ##########
         return H
