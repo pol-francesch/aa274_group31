@@ -106,7 +106,7 @@ class CameraCalibrator:
         """
         ########## Code starts here ##########
         # Pick top left as origin
-        d = 20.5
+        d = self.d_square
         x = np.arange(start=d, stop=d*10, step=d)
         y = np.arange(start=d, stop=d*8, step=d)
 
@@ -132,21 +132,28 @@ class CameraCalibrator:
         """
         ########## Code starts here ##########
         # Prep work
-        zeros_mat = np.zeros_like(M_bar)
+        M_tilde = np.array([X, Y, np.ones((X.size))]).T
+        zeros_mat = np.zeros_like(M_tilde)
+
+        print(u_meas.shape)
+        print(M_tilde.shape)
 
         # Get initial guess
-        L = np.array([[np.transpose(M_bar), np.transpose(zero_mat), -u*np.transpose(M_bar)],
-                      [np.transpose(zeros_mat), np.transpose(M_bar), -v*np.transpose(M_bar)]])
-        u, s, _ = np.linalg.svd(L) # is this the right equation
+        L = np.array([[np.transpose(M_tilde), np.transpose(zeros_mat), -u_meas*np.transpose(M_tilde)],
+                      [np.transpose(zeros_mat), np.transpose(M_tilde), -v_meas*np.transpose(M_tilde)]])
+        u, s, _ = np.linalg.svd(L) # is this the right equation?
 
         x = u[np.argmin(s), :] # check the dimensions
 
-        m_hat_0 = 1 / (np.transpose(x[2])@M) * np.array([[np.transpose(x[0])@M], [np.transpose(x[1])@M]])
+        H = x
 
-        # Develop function
+        # m_hat_0 = 1 / (np.transpose(x[2])@M) * np.array([[np.transpose(x[0])@M], [np.transpose(x[1])@M]])
 
-        # Levenberg Marquardt Algorithm
-        res = scipy.optimize.least_squares(func, x0=m_hat_0, method="lm")
+        # # Develop function
+        # func = lambda mhat: np.sum(np.linalg.norm(m-mhat))
+
+        # # Levenberg Marquardt Algorithm
+        # res = scipy.optimize.least_squares(func, x0=m_hat_0, method="lm")
 
         ########## Code ends here ##########
         return H
