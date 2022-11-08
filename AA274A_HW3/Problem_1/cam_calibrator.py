@@ -174,12 +174,46 @@ class CameraCalibrator:
         HINT: What is the size of V?
         """
         ########## Code starts here ##########
+        def calc_vij(H, i, j):
+            return np.array([
+                    [H[0,i] * H[j,0]],
+                    [H[0,i] * H[j,1] + H[1,i] * H[j,0]],
+                    [H[1,i] * H[j,1]],
+                    [H[2,i] * H[j,0] + H[0,i] * H[j,2]],
+                    [H[2,i] * H[j,1] + H[1,i] * H[j,2]],
+                    [H[2,i] * H[j,2]]
+                ]).T
+        
+        # Calculate V
+        V = np.zeros((2*len(H), 6))
 
+        for i in range(0, self.n_chessboards):
+            v12 = calc_vij(H[i], 1, 0)
+            v11 = calc_vij(H[i], 0, 0)
+            v22 = calc_vij(H[i], 1, 1)
 
+            V[2*i:2*(i+1), :] = np.vstack((v12, (v11-v22)))
 
+        # Use SVD to get the eigenvectors and eigenvalues
+        u, s, _ = np.linalg.svd(V.T@V)
 
+        # Pick the eigenvector associated with the smallest eigenvalue
+        b = u[np.argmin(s), :]
+        B11 = b[0]; B12 = b[1]; B22 = b[2]; B13 = b[3]; B23 = b[4]; B33 = b[5]
 
+        # Get intrisic parameters
+        v0    = (B12*B13 - B11*B23) / (B11*B22 - B12*B12)
+        lam   = B33 - (B13*B13 + v0*(B12*B13 - B11*B23)) / B11
+        alpha = np.sqrt(lam / B11)
+        beta  = np.sqrt(lam*B11 / (B11*B22 - B12*B12))
+        gamma = -B12*alpha*alpha*beta/lam
+        u0    = gamma * v0 / beta - B13 * alpha*alpha/lam
 
+        # Build A
+        A = np.array([[alpha, gamma, u0],
+                      [0, beta, v0],
+                      [0, 0, 1]])
+        print(A)
         ########## Code ends here ##########
         return A
 
