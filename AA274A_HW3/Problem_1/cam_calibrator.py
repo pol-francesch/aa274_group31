@@ -107,12 +107,13 @@ class CameraCalibrator:
         ########## Code starts here ##########
         # Pick top left as origin
         d = self.d_square
-        x = np.arange(start=d, stop=d*10, step=d)
-        y = np.arange(start=d, stop=d*8, step=d)
+        x = np.arange(start=d, stop=d*(self.n_corners_x+1), step=d, dtype=np.float64)
+        y = np.arange(start=d, stop=d*7.5, step=d, dtype=np.float64)
 
         Xg, Yg = np.meshgrid(x,y)
 
-        corner_coordinates = (Xg, Yg)
+        corner_coordinates = (np.repeat(Xg[np.newaxis,...], self.n_chessboards, axis=0).tolist(), np.repeat(Yg[np.newaxis,...], self.n_chessboards, axis=0).tolist())
+
         ########## Code ends here ##########
         return corner_coordinates
 
@@ -132,29 +133,27 @@ class CameraCalibrator:
         """
         ########## Code starts here ##########
         # Prep work
-        M_tilde = np.array([X, Y, np.ones((X.size))]).T
-        zeros_mat = np.zeros_like(M_tilde)
+        zeros_mat = np.zeros((1,3))
+        n = u_meas.shape[0]
 
-        print(u_meas.shape)
-        print(M_tilde.shape)
+        L = np.zeros((2*n, 9))
+        X = np.array(X).flatten()
+        Y = np.array(Y).flatten()
 
-        # Get initial guess
-        L = np.array([[np.transpose(M_tilde), np.transpose(zeros_mat), -u_meas*np.transpose(M_tilde)],
-                      [np.transpose(zeros_mat), np.transpose(M_tilde), -v_meas*np.transpose(M_tilde)]])
-        u, s, _ = np.linalg.svd(L) # is this the right equation?
+        # Calulate M_tilde and L
+        for point in range(0, n):
+            M_tilde = np.array([[X[point]], [Y[point]], [1]], dtype=np.float64).T
 
-        x = u[np.argmin(s), :] # check the dimensions
+            L[2*point:2*(point+1),:] = np.vstack((np.hstack((M_tilde, zeros_mat, -u_meas[point]*M_tilde)),
+                                                  np.hstack((zeros_mat, M_tilde, -v_meas[point]*M_tilde))))
 
-        H = x
+        # Use SVD to get the eigenvectors and eigenvalues
+        u, s, _ = np.linalg.svd(L.T@L)
 
-        # m_hat_0 = 1 / (np.transpose(x[2])@M) * np.array([[np.transpose(x[0])@M], [np.transpose(x[1])@M]])
+        # Pick the eigenvector associated with the smallest eigenvalue
+        x = u[np.argmin(s), :]
 
-        # # Develop function
-        # func = lambda mhat: np.sum(np.linalg.norm(m-mhat))
-
-        # # Levenberg Marquardt Algorithm
-        # res = scipy.optimize.least_squares(func, x0=m_hat_0, method="lm")
-
+        H = x.reshape((3,3))
         ########## Code ends here ##########
         return H
 
