@@ -240,10 +240,10 @@ class CameraCalibrator:
         # Use SVD to find R
         u, _, v = np.linalg.svd(Q)
 
-        R = u@np.transpose(v)
+        R = u@v
         
         # Translation vector
-        t = lam * A_inv * H[:,2]
+        t = lam * A_inv @ H[:,2]
 
         ########## Code ends here ##########
         return R, t
@@ -281,11 +281,13 @@ class CameraCalibrator:
             u, v: the coordinates in the ideal pixel image plane
         """
         ########## Code starts here ##########
+        s = 1
+        M_tilde = np.hstack((X, Y, Z, np.ones(X.size))).T
+        middle  = np.hstack((R, t))
 
-
-
-
-
+        m_tilde = s * A @ middle @ M_tilde
+        u = m_tilde[0,:]
+        v = m_tilde[1,:]        
         ########## Code ends here ##########
         return u, v
 
