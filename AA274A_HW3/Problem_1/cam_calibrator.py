@@ -204,8 +204,6 @@ class CameraCalibrator:
         # Get intrisic parameters
         v0    = (B12*B13 - B11*B23) / (B11*B22 - B12*B12)
         lam   = B33 - (B13*B13 + v0*(B12*B13 - B11*B23)) / B11
-        print(lam)
-        print(lam*B11 / (B11*B22 - B12*B12))
         alpha = np.sqrt(lam / B11)
         beta  = np.sqrt(lam*B11 / (B11*B22 - B12*B12))
         gamma = -B12*alpha*alpha*beta/lam
@@ -229,10 +227,23 @@ class CameraCalibrator:
             t: the translation vector
         """
         ########## Code starts here ##########
+        # Prep work
+        A_inv = np.linalg.inv(A)
+        lam = 1 / np.linalg.norm(A_inv@H[:,0])
 
+        # Find Q
+        r1  = lam * A_inv @ H[:,0]
+        r2  = lam * A_inv @ H[:,1]
+        r3  = np.cross(r1, r2)
+        Q = np.hstack((r1.reshape((3,1)), r2.reshape((3,1)), r3.reshape((3,1))))
 
+        # Use SVD to find R
+        u, _, v = np.linalg.svd(Q)
 
-
+        R = u@np.transpose(v)
+        
+        # Translation vector
+        t = lam * A_inv * H[:,2]
 
         ########## Code ends here ##########
         return R, t
