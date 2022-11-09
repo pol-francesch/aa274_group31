@@ -282,10 +282,14 @@ class CameraCalibrator:
         """
         ########## Code starts here ##########
         s = 1
-        M_tilde = np.hstack((X, Y, Z, np.ones(X.size))).T
-        middle  = np.hstack((R, t))
+        M_tilde = np.vstack((X, Y, np.ones((X.size,))))
+        middle  = np.insert(R, [3], t.reshape((3,1)), axis=1)
+        middle = np.delete(middle, 2, axis=1)
 
-        m_tilde = s * A @ middle @ M_tilde
+        print(np.array_equal(X, M_tilde[0,:]))
+        print(np.array_equal(Y, M_tilde[1,:]))
+
+        m_tilde = 1/s * A @ middle @ M_tilde
         u = m_tilde[0,:]
         v = m_tilde[1,:]        
         ########## Code ends here ##########
