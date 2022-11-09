@@ -176,19 +176,19 @@ class CameraCalibrator:
         ########## Code starts here ##########
         def calc_vij(H, i, j):
             return np.array([
-                    [H[0,i] * H[j,0]],
-                    [H[0,i] * H[j,1] + H[1,i] * H[j,0]],
-                    [H[1,i] * H[j,1]],
-                    [H[2,i] * H[j,0] + H[0,i] * H[j,2]],
-                    [H[2,i] * H[j,1] + H[1,i] * H[j,2]],
-                    [H[2,i] * H[j,2]]
+                    [H[0,i] * H[0,j]],
+                    [H[0,i] * H[1,j] + H[1,i] * H[0,j]],
+                    [H[1,i] * H[1,j]],
+                    [H[2,i] * H[0,j] + H[0,i] * H[2,j]],
+                    [H[2,i] * H[1,j] + H[1,i] * H[2,j]],
+                    [H[2,i] * H[2,j]]
                 ]).T
         
         # Calculate V
-        V = np.zeros((2*len(H), 6))
+        V = np.zeros((2*self.n_chessboards, 6))
 
         for i in range(0, self.n_chessboards):
-            v12 = calc_vij(H[i], 1, 0)
+            v12 = calc_vij(H[i], 0, 1)
             v11 = calc_vij(H[i], 0, 0)
             v22 = calc_vij(H[i], 1, 1)
 
@@ -204,6 +204,8 @@ class CameraCalibrator:
         # Get intrisic parameters
         v0    = (B12*B13 - B11*B23) / (B11*B22 - B12*B12)
         lam   = B33 - (B13*B13 + v0*(B12*B13 - B11*B23)) / B11
+        print(lam)
+        print(lam*B11 / (B11*B22 - B12*B12))
         alpha = np.sqrt(lam / B11)
         beta  = np.sqrt(lam*B11 / (B11*B22 - B12*B12))
         gamma = -B12*alpha*alpha*beta/lam
