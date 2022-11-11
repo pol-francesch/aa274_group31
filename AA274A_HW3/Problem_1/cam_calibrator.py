@@ -195,11 +195,9 @@ class CameraCalibrator:
             V[2*i:2*(i+1), :] = np.vstack((v12, (v11-v22)))
 
         # Use SVD to get the eigenvectors and eigenvalues
-        # u, s, _ = np.linalg.svd(V.T@V)
         u2, s2, v2 = np.linalg.svd(V)
 
         # Pick the eigenvector associated with the smallest eigenvalue
-        # b = u[np.argmin(s), :]
         b = v2[-1,:]
 
         B11 = b[0]; B12 = b[1]; B22 = b[2]; B13 = b[3]; B23 = b[4]; B33 = b[5]
@@ -270,8 +268,8 @@ class CameraCalibrator:
 
         Pc = left @ right
 
-        x = Pc[0,:]
-        y = Pc[1,:]
+        x = Pc[0,:] / Pc[2,:]
+        y = Pc[1,:] / Pc[2,:]
 
         ########## Code ends here ##########
         return x, y
@@ -289,30 +287,12 @@ class CameraCalibrator:
             u, v: the coordinates in the ideal pixel image plane
         """
         ########## Code starts here ##########
-        s = -56.08075592/18.46539312
         M_tilde = np.vstack((X, Y, Z, np.ones((X.size,))))
         middle  = np.hstack((R, t.reshape((3,1))))
-        print(A[0,0])
-        print()
-        # M_tilde = M_tilde / np.max(M_tilde)
 
-        # print(R)
-        # print(t)
-        # print(middle)
-        # print(A.shape)
-
-        m_tilde = s * A @ middle @ M_tilde
-        u = m_tilde[0,:]
-        v = m_tilde[1,:]
-
-        # print(u[0])
-        # print(np.dot(np.array([np.dot(A[0,:], middle[:,0]),
-        #                        np.dot(A[0,:], middle[:,1]),
-        #                        np.dot(A[0,:], middle[:,2]),
-        #                        np.dot(A[0,:], middle[:,3]),]),
-        #              M_tilde[:,0]))
-        # print()
-
+        m_tilde = A @ middle @ M_tilde
+        u = m_tilde[0,:] / m_tilde[2,:]
+        v = m_tilde[1,:] / m_tilde[2,:]
         ########## Code ends here ##########
         return u, v
 
