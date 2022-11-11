@@ -186,7 +186,7 @@ class CameraCalibrator:
         
         # Calculate V
         V = np.zeros((2*self.n_chessboards, 6))
-
+        # print(H[0])
         for i in range(0, self.n_chessboards):
             v12 = calc_vij(H[i], 0, 1)
             v11 = calc_vij(H[i], 0, 0)
@@ -195,10 +195,13 @@ class CameraCalibrator:
             V[2*i:2*(i+1), :] = np.vstack((v12, (v11-v22)))
 
         # Use SVD to get the eigenvectors and eigenvalues
-        u, s, _ = np.linalg.svd(V.T@V)
+        # u, s, _ = np.linalg.svd(V.T@V)
+        u2, s2, v2 = np.linalg.svd(V)
 
         # Pick the eigenvector associated with the smallest eigenvalue
-        b = u[np.argmin(s), :]
+        # b = u[np.argmin(s), :]
+        b = v2[-1,:]
+
         B11 = b[0]; B12 = b[1]; B22 = b[2]; B13 = b[3]; B23 = b[4]; B33 = b[5]
 
         # Get intrisic parameters
@@ -261,9 +264,14 @@ class CameraCalibrator:
 
         """
         ########## Code starts here ##########
+        # From equation (8.12) in the course notes
+        left = np.vstack((np.hstack((R, t.reshape((3,1)))), np.array([0,0,0,1])))
+        right = np.vstack((X, Y, Z, np.ones((X.size,))))
 
+        Pc = left @ right
 
-
+        x = Pc[0,:]
+        y = Pc[1,:]
 
         ########## Code ends here ##########
         return x, y
@@ -281,17 +289,30 @@ class CameraCalibrator:
             u, v: the coordinates in the ideal pixel image plane
         """
         ########## Code starts here ##########
-        s = 1
-        M_tilde = np.vstack((X, Y, np.ones((X.size,))))
-        middle  = np.insert(R, [3], t.reshape((3,1)), axis=1)
-        middle = np.delete(middle, 2, axis=1)
+        s = -56.08075592/18.46539312
+        M_tilde = np.vstack((X, Y, Z, np.ones((X.size,))))
+        middle  = np.hstack((R, t.reshape((3,1))))
+        print(A[0,0])
+        print()
+        # M_tilde = M_tilde / np.max(M_tilde)
 
-        print(np.array_equal(X, M_tilde[0,:]))
-        print(np.array_equal(Y, M_tilde[1,:]))
+        # print(R)
+        # print(t)
+        # print(middle)
+        # print(A.shape)
 
-        m_tilde = 1/s * A @ middle @ M_tilde
+        m_tilde = s * A @ middle @ M_tilde
         u = m_tilde[0,:]
-        v = m_tilde[1,:]        
+        v = m_tilde[1,:]
+
+        # print(u[0])
+        # print(np.dot(np.array([np.dot(A[0,:], middle[:,0]),
+        #                        np.dot(A[0,:], middle[:,1]),
+        #                        np.dot(A[0,:], middle[:,2]),
+        #                        np.dot(A[0,:], middle[:,3]),]),
+        #              M_tilde[:,0]))
+        # print()
+
         ########## Code ends here ##########
         return u, v
 
