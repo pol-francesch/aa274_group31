@@ -15,7 +15,18 @@ def compute_Gx(xvec, u, dt):
     # HINT: Since theta is changing with time, try integrating x, y wrt d(theta) instead of dt by introducing om
     # HINT: When abs(om) < EPSILON_OMEGA, assume that the theta stays approximately constant ONLY for calculating the next x, y
     #       New theta should not be equal to theta. Jacobian with respect to om is not 0.
-        
+    V = u[0]
+    w = u[1]
+    theta = xvec[2] 
+    theta_new = theta + w*dt 
+
+    # if np.abs(w) <= EPSILON_OMEGA:
+    #     Gx = np.array([[1,0,V/w*[np.cos(theta_new) - np.cos(theta)]],[0,1,V/w*[np.sin(theta_new) - np.sin(theta)]],[0,0,1]])
+    # else:
+    
+    
+    Gx = np.array([[1,0,V/w*[np.cos(theta_new) - np.cos(theta)]],[0,1,V/w*[np.sin(theta_new) - np.sin(theta)]],[0,0,1]])
+
     ########## Code ends here ##########
     return Gx
     
@@ -33,7 +44,14 @@ def compute_Gu(xvec, u, dt):
     # HINT: Since theta is changing with time, try integrating x, y wrt d(theta) instead of dt by introducing om
     # HINT: When abs(om) < EPSILON_OMEGA, assume that the theta stays approximately constant ONLY for calculating the next x, y
     #       New theta should not be equal to theta. Jacobian with respect to om is not 0.
-        
+    #TODO add if case for both jacobians.
+    V = u[0]
+    w = u[1]
+    theta = xvec[2] 
+    theta_new = theta + w*dt 
+
+    Gu = np.array([[1/w*[np.sin(theta_new) - np.sin(theta)],V*[np.sin(theta_new) - np.sin(theta)]], [-1/w*[np.cos(theta_new) - np.cos(theta)],-V*[np.cos(theta_new) - np.cos(theta)]], [0,dt]])
+
     ########## Code ends here ##########
     return Gu
 
@@ -57,7 +75,28 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
     # HINT: Since theta is changing with time, try integrating x, y wrt d(theta) instead of dt by introducing om
     # HINT: When abs(om) < EPSILON_OMEGA, assume that the theta stays approximately constant ONLY for calculating the next x, y
     #       New theta should not be equal to theta. Jacobian with respect to om is not 0.
+    V = u[0]
+    w = u[1]
+    theta = xvec[2] 
 
+    if np.abs(w) <= EPSILON_OMEGA:
+        #TODO: 
+        x_new = xvec[0] + V*np.sin(theta)*dt
+        y_new = xvec[1] - V*np.cos(theta)*dt
+        theta_new = theta + w*dt
+
+
+    else:
+        theta_new = theta + w*dt 
+        x_new = xvec[0] + V/w* [np.sin(theta_new) - np.sin(theta) ]
+        y_new = xvec[1] - V/w* [np.cos(theta_new) - np.cos(theta) ]
+
+        
+    g = [x_new, y_new , theta_new]
+    #DONE check logic for g so far
+    Gx = compute_Gx
+    Gu = compute_Gu
+    #DONE how to get Jacobians? 
 
     ########## Code ends here ##########
 

@@ -43,7 +43,8 @@ class Ekf(object):
 
         ########## Code starts here ##########
         # TODO: Update self.x, self.Sigma.
-        self.x = g  #TODO check if i need to give g inputs like g(x_t-1, ut)
+        self.x = g[0]  #Done check if i need to give g inputs like g(x_t-1, ut)
+
 
         R = self.R
         self.Sigma = Gx*self.Sigma*Gx.T + dt*Gu*R*Gu.T #TODO check type of multiplication, @ or dot
@@ -219,7 +220,8 @@ class EkfLocalization(Ekf):
         #       find the closest predicted line and the corresponding minimum Mahalanobis distance
         #       if the minimum distance satisfies the gating criteria, add corresponding entries to v_list, Q_list, H_list
 
-
+        # h_t = 
+        # v_list = z_raw - h_t
         ########## Code ends here ##########
 
         return v_list, Q_list, H_list

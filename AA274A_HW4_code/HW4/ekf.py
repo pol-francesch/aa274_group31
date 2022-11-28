@@ -220,8 +220,8 @@ class EkfLocalization(Ekf):
         #       find the closest predicted line and the corresponding minimum Mahalanobis distance
         #       if the minimum distance satisfies the gating criteria, add corresponding entries to v_list, Q_list, H_list
 
-        h_t = 
-        v_list = z_raw - h_t
+        # h_t = 
+        # v_list = z_raw - h_t
         ########## Code ends here ##########
 
         return v_list, Q_list, H_list
