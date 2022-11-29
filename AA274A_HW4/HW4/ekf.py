@@ -146,10 +146,7 @@ class EkfLocalization(Ekf):
 
         ########## Code starts here ##########
         # TODO: Compute g, Gx, Gu using tb.compute_dynamics().
-        # xvec = self.tf_base_to_camera #TODO where else to get xvec?
-
         g, Gx, Gu = tb.compute_dynamics(self.x, u, dt, compute_jacobians=True)
-
         ########## Code ends here ##########
 
         return g, Gx, Gu

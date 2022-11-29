@@ -20,8 +20,8 @@ def compute_Gx(xvec, u, dt):
     theta = xvec[2] 
 
     if np.abs(w) < EPSILON_OMEGA:
-        Gx = np.array([[1,0,V*np.cos(theta)*dt],
-                       [0,1,V*np.sin(theta)*dt],
+        Gx = np.array([[1,0,-V*np.sin(theta)*dt],
+                       [0,1,V*np.cos(theta)*dt],
                        [0,0,1]])
     else:
         theta_new = theta + w*dt 
@@ -50,8 +50,8 @@ def compute_Gu(xvec, u, dt):
     theta = xvec[2] 
 
     if np.abs(w) < EPSILON_OMEGA:
-        Gu = np.array([[np.sin(theta)*dt,0],
-                       [-np.cos(theta)*dt,1],
+        Gu = np.array([[np.cos(theta)*dt,0],
+                       [np.sin(theta)*dt,0],
                        [0,dt]])
     else:
         theta_new = theta + w*dt 
@@ -85,9 +85,9 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
     w = u[1]
     theta = xvec[2] 
 
-    if np.abs(w) <= EPSILON_OMEGA:
-        x_new = xvec[0] + V*np.sin(theta)*dt
-        y_new = xvec[1] - V*np.cos(theta)*dt
+    if np.abs(w) < EPSILON_OMEGA:
+        x_new = xvec[0] + V*np.cos(theta)*dt
+        y_new = xvec[1] + V*np.sin(theta)*dt
         theta_new = theta + w*dt
     else:
         theta_new = theta + w*dt 
