@@ -64,9 +64,9 @@ def compute_Gu(xvec, u, dt):
         # print("compute_Gx_if", Gx)
 
     else:
-        Gu = np.array([[1/w*(np.sin(theta_new) - np.sin(theta)),-V/(w**2)*(np.sin(theta_new) - np.sin(theta))], 
-                       [-1/w*(np.cos(theta_new) - np.cos(theta)),V/(w**2)*(np.cos(theta_new) - np.cos(theta))], 
-                       [0,dt]])
+        Gu = np.array([[1/w*(np.sin(theta_new) - np.sin(theta)),-V/(w**2)*(np.cos(theta_new)*dt - np.sin(theta))], 
+                       [-1/w*(np.cos(theta_new) - np.cos(theta)),V/(w**2)*(np.sin(theta_new)*dt - np.cos(theta))], 
+                       [0,dt]])1
     # print("compute_Gu", Gu)
 
     ########## Code ends here ##########

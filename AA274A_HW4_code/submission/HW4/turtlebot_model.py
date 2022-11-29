@@ -55,9 +55,18 @@ def compute_Gu(xvec, u, dt):
     w = u[1]
     theta = xvec[2] 
     theta_new = theta + w*dt 
-    Gu = np.array([[1/w*(np.sin(theta_new) - np.sin(theta)),-V/(w**2)*(np.sin(theta_new) - np.sin(theta))], 
-                   [-1/w*(np.cos(theta_new) - np.cos(theta)),V/(w**2)*(np.cos(theta_new) - np.cos(theta))], 
-                   [0,dt]])
+
+    if np.abs(w) <= EPSILON_OMEGA:
+
+        Gu = np.array([[np.sin(theta)*dt,0],
+                       [-np.cos(theta)*dt,1],
+                       [0,dt]])
+        # print("compute_Gx_if", Gx)
+
+    else:
+        Gu = np.array([[1/w*(np.sin(theta_new) - np.sin(theta)),-V/(w**2)*(np.cos(theta_new)*dt - np.sin(theta))], 
+                       [-1/w*(np.cos(theta_new) - np.cos(theta)),V/(w**2)*(np.sin(theta_new)*dt - np.cos(theta))], 
+                       [0,dt]])1
     # print("compute_Gu", Gu)
 
     ########## Code ends here ##########
