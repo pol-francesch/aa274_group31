@@ -18,21 +18,16 @@ def compute_Gx(xvec, u, dt):
     V = u[0]
     w = u[1]
     theta = xvec[2] 
-    theta_new = theta + w*dt 
 
-    if np.abs(w) <= EPSILON_OMEGA:
+    if np.abs(w) < EPSILON_OMEGA:
         Gx = np.array([[1,0,V*np.cos(theta)*dt],
                        [0,1,V*np.sin(theta)*dt],
                        [0,0,1]])
-        # print("compute_Gx_if", Gx)
-
     else:
-    
-    
+        theta_new = theta + w*dt 
         Gx = np.array([[1,0,V/w*(np.cos(theta_new) - np.cos(theta))],
                        [0,1,V/w*(np.sin(theta_new) - np.sin(theta))],
                        [0,0,1]])
-        # print("compute_Gx_else", Gx)
     ########## Code ends here ##########
     return Gx
     
@@ -50,25 +45,19 @@ def compute_Gu(xvec, u, dt):
     # HINT: Since theta is changing with time, try integrating x, y wrt d(theta) instead of dt by introducing om
     # HINT: When abs(om) < EPSILON_OMEGA, assume that the theta stays approximately constant ONLY for calculating the next x, y
     #       New theta should not be equal to theta. Jacobian with respect to om is not 0.
-    #TODO add if case for both jacobians.
     V = u[0]
     w = u[1]
     theta = xvec[2] 
-    theta_new = theta + w*dt 
 
-    if np.abs(w) <= EPSILON_OMEGA:
-
+    if np.abs(w) < EPSILON_OMEGA:
         Gu = np.array([[np.sin(theta)*dt,0],
                        [-np.cos(theta)*dt,1],
                        [0,dt]])
-        # print("compute_Gx_if", Gx)
-
     else:
-        Gu = np.array([[1/w*(np.sin(theta_new) - np.sin(theta)),-V/(w**2)*(np.cos(theta_new)*dt - np.sin(theta))], 
-                       [-1/w*(np.cos(theta_new) - np.cos(theta)),V/(w**2)*(np.sin(theta_new)*dt - np.cos(theta))], 
+        theta_new = theta + w*dt 
+        Gu = np.array([[1/w*(np.sin(theta_new) - np.sin(theta)),-V/(w**2)*(np.sin(theta_new) - np.cos(theta_new)*dt*w - np.sin(theta))], 
+                       [-1/w*(np.cos(theta_new) - np.cos(theta)),V/(w**2)*(np.cos(theta_new) + np.sin(theta_new)*dt*w - np.cos(theta))], 
                        [0,dt]])
-    # print("compute_Gu", Gu)
-
     ########## Code ends here ##########
     return Gu
 
@@ -97,29 +86,18 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
     theta = xvec[2] 
 
     if np.abs(w) <= EPSILON_OMEGA:
-        # print("compute_g_if", theta)
-
-        #TODO: 
         x_new = xvec[0] + V*np.sin(theta)*dt
         y_new = xvec[1] - V*np.cos(theta)*dt
         theta_new = theta + w*dt
-
-
     else:
-        # print("compute_g_else", theta)
-
         theta_new = theta + w*dt 
         x_new = xvec[0] + V/w* (np.sin(theta_new) - np.sin(theta) )
         y_new = xvec[1] - V/w* (np.cos(theta_new) - np.cos(theta) )
-
-        
+   
     g = [x_new, y_new , theta_new]
-    #DONE check logic for g so far
+
     Gx = compute_Gx
     Gu = compute_Gu
-    #DONE how to get Jacobians? 
-    # print("compute_g", g)
-
     ########## Code ends here ##########
 
     if not compute_jacobians:
