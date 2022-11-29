@@ -43,12 +43,8 @@ class Ekf(object):
 
         ########## Code starts here ##########
         # TODO: Update self.x, self.Sigma.
-        self.x = g[0]  #Done check if i need to give g inputs like g(x_t-1, ut)
-
-
-        R = self.R
-        # self.Sigma = Gx*self.Sigma*Gx.T + dt*Gu*R*Gu.T #TODO check type of multiplication, @ or dot
-
+        self.x = g
+        self.Sigma = Gx@self.Sigma@Gx.T + dt*Gu@self.R@Gu.T 
         ########## Code ends here ##########
 
     def transition_model(self, u, dt):
