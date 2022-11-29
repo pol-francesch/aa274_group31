@@ -96,8 +96,8 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
    
     g = np.array([x_new, y_new , theta_new])
 
-    Gx = compute_Gx
-    Gu = compute_Gu
+    Gx = compute_Gx(xvec, u, dt)
+    Gu = compute_Gu(xvec, u, dt)
     ########## Code ends here ##########
 
     if not compute_jacobians:
