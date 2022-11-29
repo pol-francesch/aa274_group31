@@ -20,13 +20,19 @@ def compute_Gx(xvec, u, dt):
     theta = xvec[2] 
     theta_new = theta + w*dt 
 
-    # if np.abs(w) <= EPSILON_OMEGA:
-    #     Gx = np.array([[1,0,V/w*[np.cos(theta_new) - np.cos(theta)]],[0,1,V/w*[np.sin(theta_new) - np.sin(theta)]],[0,0,1]])
-    # else:
-    
-    
-    Gx = np.array([[1,0,V/w*[np.cos(theta_new) - np.cos(theta)]],[0,1,V/w*[np.sin(theta_new) - np.sin(theta)]],[0,0,1]])
+    if np.abs(w) <= EPSILON_OMEGA:
+        Gx = np.array([[1,0,V*np.cos(theta)*dt],
+                       [0,1,V*np.sin(theta)*dt],
+                       [0,0,1]])
+        # print("compute_Gx_if", Gx)
 
+    else:
+    
+    
+        Gx = np.array([[1,0,V/w*(np.cos(theta_new) - np.cos(theta))],
+                       [0,1,V/w*(np.sin(theta_new) - np.sin(theta))],
+                       [0,0,1]])
+        # print("compute_Gx_else", Gx)
     ########## Code ends here ##########
     return Gx
     
@@ -50,7 +56,18 @@ def compute_Gu(xvec, u, dt):
     theta = xvec[2] 
     theta_new = theta + w*dt 
 
-    Gu = np.array([[1/w*[np.sin(theta_new) - np.sin(theta)],V*[np.sin(theta_new) - np.sin(theta)]], [-1/w*[np.cos(theta_new) - np.cos(theta)],-V*[np.cos(theta_new) - np.cos(theta)]], [0,dt]])
+    if np.abs(w) <= EPSILON_OMEGA:
+
+        Gu = np.array([[np.sin(theta)*dt,0],
+                       [-np.cos(theta)*dt,1],
+                       [0,dt]])
+        # print("compute_Gx_if", Gx)
+
+    else:
+        Gu = np.array([[1/w*(np.sin(theta_new) - np.sin(theta)),-V/(w**2)*(np.sin(theta_new) - np.sin(theta))], 
+                       [-1/w*(np.cos(theta_new) - np.cos(theta)),V/(w**2)*(np.cos(theta_new) - np.cos(theta))], 
+                       [0,dt]])
+    # print("compute_Gu", Gu)
 
     ########## Code ends here ##########
     return Gu
@@ -80,6 +97,8 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
     theta = xvec[2] 
 
     if np.abs(w) <= EPSILON_OMEGA:
+        # print("compute_g_if", theta)
+
         #TODO: 
         x_new = xvec[0] + V*np.sin(theta)*dt
         y_new = xvec[1] - V*np.cos(theta)*dt
@@ -87,9 +106,11 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
 
 
     else:
+        # print("compute_g_else", theta)
+
         theta_new = theta + w*dt 
-        x_new = xvec[0] + V/w* [np.sin(theta_new) - np.sin(theta) ]
-        y_new = xvec[1] - V/w* [np.cos(theta_new) - np.cos(theta) ]
+        x_new = xvec[0] + V/w* (np.sin(theta_new) - np.sin(theta) )
+        y_new = xvec[1] - V/w* (np.cos(theta_new) - np.cos(theta) )
 
         
     g = [x_new, y_new , theta_new]
@@ -97,6 +118,7 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
     Gx = compute_Gx
     Gu = compute_Gu
     #DONE how to get Jacobians? 
+    # print("compute_g", g)
 
     ########## Code ends here ##########
 

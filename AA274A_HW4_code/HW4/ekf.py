@@ -47,7 +47,7 @@ class Ekf(object):
 
 
         R = self.R
-        self.Sigma = Gx*self.Sigma*Gx.T + dt*Gu*R*Gu.T #TODO check type of multiplication, @ or dot
+        # self.Sigma = Gx*self.Sigma*Gx.T + dt*Gu*R*Gu.T #TODO check type of multiplication, @ or dot
 
         ########## Code ends here ##########
 
@@ -146,8 +146,9 @@ class EkfLocalization(Ekf):
 
         ########## Code starts here ##########
         # TODO: Compute g, Gx, Gu using tb.compute_dynamics().
-        xvec = self.tf_base_to_camera #TODO where else to get xvec?
-        g, Gx, Gu = tb.compute_dynamics(xvec, u, dt, compute_jacobians=True)
+        # xvec = self.tf_base_to_camera #TODO where else to get xvec?
+
+        g, Gx, Gu = tb.compute_dynamics(self.x, u, dt, compute_jacobians=True)
 
         ########## Code ends here ##########
 
