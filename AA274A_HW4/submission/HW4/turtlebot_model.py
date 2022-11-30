@@ -94,10 +94,10 @@ def compute_dynamics(xvec, u, dt, compute_jacobians=True):
         x_new = xvec[0] + V/w* (np.sin(theta_new) - np.sin(theta) )
         y_new = xvec[1] - V/w* (np.cos(theta_new) - np.cos(theta) )
    
-    g = [x_new, y_new , theta_new]
+    g = np.array([x_new, y_new , theta_new])
 
-    Gx = compute_Gx
-    Gu = compute_Gu
+    Gx = compute_Gx(xvec, u, dt)
+    Gu = compute_Gu(xvec, u, dt)
     ########## Code ends here ##########
 
     if not compute_jacobians:
@@ -131,7 +131,24 @@ def transform_line_to_scanner_frame(line, x, tf_base_to_camera, compute_jacobian
     # HINT: What is the projection of the camera location (x_cam, y_cam) on the line r? 
     # HINT: To find Hx, write h in terms of the pose of the base in world frame (x_base, y_base, th_base)
 
+    # Find camera pose in world frame
+    theta = x[2]
+    rbc_world = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]]) @ tf_base_to_camera[0:2]
+    camera_world = x + np.append(rbc_world, tf_base_to_camera[2])       # pose of camera in world frame (x_cam, y_cam, th_cam)
 
+    # Find line parameters in camera frame
+    psi  = np.arctan2(camera_world[1], camera_world[0])
+    proj = np.linalg.norm(camera_world[0:2])*np.cos(alpha - psi)
+    r_in_cam = r - proj
+
+    alpha_in_cam = alpha - camera_world[2]
+    h = np.array([alpha_in_cam, r_in_cam])
+
+    # Find the Jacobian
+    rbc = np.linalg.norm(tf_base_to_camera)
+    beta = np.arctan2(tf_base_to_camera[1], tf_base_to_camera[0])
+    Hx = np.array([[0, 0, -1],
+                   [-np.cos(alpha), -np.sin(alpha), rbc * (np.sin(theta+beta)*np.cos(alpha) - np.cos(theta+beta)*np.sin(alpha))]])
     ########## Code ends here ##########
 
     if not compute_jacobian:
