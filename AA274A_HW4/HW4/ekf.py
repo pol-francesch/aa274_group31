@@ -242,10 +242,7 @@ class EkfLocalization(Ekf):
             if dij[x] < self.g*self.g:
                 v_list.append(vij[x,:])
                 Q_list.append(Q_raw[i])
-                H_list.append(Hs[i])
-        
-        # h_t = 
-        # v_list = z_raw - h_t
+                H_list.append(Hs[j])
         ########## Code ends here ##########
 
         return v_list, Q_list, H_list
