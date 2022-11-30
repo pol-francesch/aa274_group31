@@ -131,7 +131,22 @@ def transform_line_to_scanner_frame(line, x, tf_base_to_camera, compute_jacobian
     # HINT: What is the projection of the camera location (x_cam, y_cam) on the line r? 
     # HINT: To find Hx, write h in terms of the pose of the base in world frame (x_base, y_base, th_base)
 
+    # Find camera pose in world frame
+    theta = x[2]
+    rot = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]]) @ tf_base_to_camera[0:2]
+    camera_world = x + np.append(rot, tf_base_to_camera[2])       # pose of camera in world frame (x_cam, y_cam, th_cam)
 
+    # Find line parameters in camera frame
+    psi  = np.arctan2(camera_world[1], camera_world[0])
+    proj = np.linalg.norm(camera_world[0:2])*np.cos(alpha - psi)
+    r_in_cam = r - proj
+
+    alpha_in_cam = alpha - camera_world[2]
+    h = np.array([alpha_in_cam, r_in_cam])
+
+    # Find the Jacobian
+    Hx = np.array([[0, 0, -1],
+                   [-np.cos(alpha), -np.sin(alpha), 0]])
     ########## Code ends here ##########
 
     if not compute_jacobian:

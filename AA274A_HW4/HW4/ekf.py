@@ -213,7 +213,37 @@ class EkfLocalization(Ekf):
         # HINT: For each of the I observed lines, 
         #       find the closest predicted line and the corresponding minimum Mahalanobis distance
         #       if the minimum distance satisfies the gating criteria, add corresponding entries to v_list, Q_list, H_list
+        
+        I = z_raw.shape[0]  # Num observations
+        J = hs.shape[0]     # Num features
 
+        v_list = []
+        Q_list = []
+        H_list = []
+
+        for i in range(I):
+            vij = np.zeros((J,2))
+            sij = np.zeros((J,2,2))
+            dij = np.zeros((J,))
+            # Loop over each landmark
+            for j in range(J):
+                # Find innovation
+                vij[j,0] = angle_diff(z_raw[i,0], hs[j,0])
+                vij[j,1] = z_raw[i,1] - hs[j,1]
+
+                # Find innovation covariance
+                sij[j,:,:] = Hs[j]@self.Sigma@Hs[j].T + Q_raw[i]
+
+                # Find Mahalanobis distance
+                dij[j] = vij[j,:].T @ np.linalg.inv(sij[j,:,:]) @ vij[j,:]
+            
+            # Find best match (if any)
+            x = np.argmin(dij)
+            if dij[x] < self.g*self.g:
+                v_list.append(vij[x,:])
+                Q_list.append(Q_raw[i])
+                H_list.append(Hs[i])
+        
         # h_t = 
         # v_list = z_raw - h_t
         ########## Code ends here ##########
@@ -238,7 +268,7 @@ class EkfLocalization(Ekf):
             ########## Code starts here ##########
             # TODO: Compute h, Hx using tb.transform_line_to_scanner_frame() for the j'th map line.
             # HINT: This should be a single line of code.
-
+            h, Hx = tb.transform_line_to_scanner_frame(self.map_lines[j], self.x, self.tf_base_to_camera, compute_jacobian=True)
             ########## Code ends here ##########
 
             h, Hx = tb.normalize_line_parameters(h, Hx)
