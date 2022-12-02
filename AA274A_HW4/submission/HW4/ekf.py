@@ -320,9 +320,6 @@ class EkfSlam(Ekf):
         g[0:3] = gx
         Gx[0:3,0:3] = Gxx
         Gu[0:3,0:2] = Guu
-        # print(g)
-        # print(Gx)
-        # print(Gu)
         ########## Code ends here ##########
 
         return g, Gx, Gu
@@ -351,7 +348,9 @@ class EkfSlam(Ekf):
         ########## Code starts here ##########
         # TODO: Compute z, Q, H.
         # Hint: Should be identical to EkfLocalization.measurement_model().
-
+        z = np.array(v_list).flatten()
+        Q = scipy.linalg.block_diag(*Q_list)
+        H = np.concatenate(H_list, axis=0)
         ########## Code ends here ##########
 
         return z, Q, H
@@ -382,7 +381,35 @@ class EkfSlam(Ekf):
         # HINT: Should be almost identical to EkfLocalization.compute_innovations(). What is J now?
         # HINT: Instead of getting world-frame line parameters from self.map_lines, you must extract them from the state self.x.
 
+        I = z_raw.shape[0]              # Num observations
+        J = (self.x.size - 3) // 2      # Num features
 
+        v_list = []
+        Q_list = []
+        H_list = []
+
+        for i in range(I):
+            vij = np.zeros((J,2))
+            sij = np.zeros((J,2,2))
+            dij = np.zeros((J,))
+            # Loop over each landmark
+            for j in range(J):
+                # Find innovation
+                vij[j,0] = angle_diff(z_raw[i,0], hs[j,0])
+                vij[j,1] = z_raw[i,1] - hs[j,1]
+
+                # Find innovation covariance
+                sij[j,:,:] = Hs[j]@self.Sigma@Hs[j].T + Q_raw[i]
+
+                # Find Mahalanobis distance
+                dij[j] = vij[j,:].T @ np.linalg.inv(sij[j,:,:]) @ vij[j,:]
+            
+            # Find best match (if any)
+            x = np.argmin(dij)
+            if dij[x] < self.g*self.g:
+                v_list.append(vij[x,:])
+                Q_list.append(Q_raw[i])
+                H_list.append(Hs[x])
         ########## Code ends here ##########
 
         return v_list, Q_list, H_list
@@ -410,8 +437,10 @@ class EkfSlam(Ekf):
             # First two map lines are assumed fixed so we don't want to propagate
             # any measurement correction to them.
             if j >= 2:
-                Hx[:,idx_j:idx_j+2] = np.eye(2)  # FIX ME!
-
+                # Hx[:,idx_j:idx_j+2] = np.eye(2)  # FIX ME!
+                h, Hx = tb.transform_line_to_scanner_frame(self.x[j], self.x[0:3], self.tf_base_to_camera, compute_jacobian=True)
+            else:
+                h, Hx = tb.transform_line_to_scanner_frame(self.x[j], self.x[0:3], self.tf_base_to_camera, compute_jacobian=True)
             ########## Code ends here ##########
 
             h, Hx = tb.normalize_line_parameters(h, Hx)
