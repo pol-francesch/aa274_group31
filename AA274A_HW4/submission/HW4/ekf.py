@@ -85,8 +85,11 @@ class Ekf(object):
 
         ########## Code starts here ##########
         # TODO: Update self.x, self.Sigma.
+        S = H @ self.Sigma @ H.T + Q
+        K = self.Sigma @ H.T @ np.linalg.inv(S)
 
-
+        self.x = self.x + K@z
+        self.Sigma = self.Sigma - K @ S @ K.T
         ########## Code ends here ##########
 
     def measurement_model(self, z_raw, Q_raw):
@@ -165,7 +168,9 @@ class EkfLocalization(Ekf):
         # TODO: Compute z, Q.
         # HINT: The scipy.linalg.block_diag() function may be useful.
         # HINT: A list can be unpacked using the * (splat) operator.
-
+        z = np.array(v_list).flatten()
+        Q = scipy.linalg.block_diag(*Q_list)
+        H = np.concatenate(H_list, axis=0)
         ########## Code ends here ##########
 
         return z, Q, H
@@ -242,7 +247,7 @@ class EkfLocalization(Ekf):
             if dij[x] < self.g*self.g:
                 v_list.append(vij[x,:])
                 Q_list.append(Q_raw[i])
-                H_list.append(Hs[j])
+                H_list.append(Hs[x])
         ########## Code ends here ##########
 
         return v_list, Q_list, H_list
