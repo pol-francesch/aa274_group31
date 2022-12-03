@@ -438,7 +438,9 @@ class EkfSlam(Ekf):
             # any measurement correction to them.
             if j >= 2:
                 # Hx[:,idx_j:idx_j+2] = np.eye(2)  # FIX ME!
-                h, Hx = tb.transform_line_to_scanner_frame(self.x[j], self.x[0:3], self.tf_base_to_camera, compute_jacobian=True)
+                h, Hx = tb.transform_line_to_scanner_frame((self.x[2j], self.x[2j+1]), self.x[0:3], self.tf_base_to_camera, compute_jacobian=True)
+            else:
+                h, Hx = tb.transform_line_to_scanner_frame(self.map_lines[j], self.x, self.tf_base_to_camera, compute_jacobian=True)
             ########## Code ends here ##########
 
             h, Hx = tb.normalize_line_parameters(h, Hx)
