@@ -433,14 +433,25 @@ class EkfSlam(Ekf):
             # HINT: The first 3 columns of Hx should be populated using the same approach as in EkfLocalization.compute_predicted_measurements().
             # HINT: The first two map lines (j=0,1) are fixed so the Jacobian of h wrt the alpha and r for those lines is just 0.
             # HINT: For the other map lines (j>2), write out h in terms of alpha and r to get the Jacobian Hx.
+            
+            # First 3 columns
+            h, Hx_ekf = tb.transform_line_to_scanner_frame(np.array([alpha,r]), self.x[0:3], self.tf_base_to_camera, compute_jacobian=True)
 
             # First two map lines are assumed fixed so we don't want to propagate
             # any measurement correction to them.
             if j >= 2:
-                # Hx[:,idx_j:idx_j+2] = np.eye(2)  # FIX ME!
-                h, Hx = tb.transform_line_to_scanner_frame(self.x[j], self.x[0:3], self.tf_base_to_camera, compute_jacobian=True)
-            else:
-                h, Hx = tb.transform_line_to_scanner_frame(self.x[j], self.x[0:3], self.tf_base_to_camera, compute_jacobian=True)
+                # Find dr/dalpha
+                xb = self.x[0]; yb = self.x[1]; theta = self.x[2]
+                rbc = np.linalg.norm(self.tf_base_to_camera[0:2])
+                beta = np.arctan2(self.tf_base_to_camera[1], self.tf_base_to_camera[0])
+                drdalpha = (xb + rbc*np.cos(beta+theta))*np.sin(alpha) - (yb + rbc*np.sin(beta+theta))*np.cos(alpha)
+
+                # Build Hx
+                H_local = np.array([[1, 0],
+                                    [drdalpha, 1]])
+                Hx[:,idx_j:idx_j+2] = H_local 
+
+            Hx[:,0:3] = Hx_ekf
             ########## Code ends here ##########
 
             h, Hx = tb.normalize_line_parameters(h, Hx)
