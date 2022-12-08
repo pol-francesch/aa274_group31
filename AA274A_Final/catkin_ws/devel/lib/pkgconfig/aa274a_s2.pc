@@ -1,0 +1,8 @@
+prefix=/data/home/group38/catkin_ws/devel
+
+Name: aa274a_s2
+Description: Description of aa274a_s2
+Version: 0.0.0
+Cflags: -I/data/home/group38/catkin_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: 

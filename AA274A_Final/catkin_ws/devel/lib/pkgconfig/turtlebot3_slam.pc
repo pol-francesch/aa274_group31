@@ -1,0 +1,8 @@
+prefix=/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/devel
+
+Name: turtlebot3_slam
+Description: Description of turtlebot3_slam
+Version: 1.2.6
+Cflags: -I/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/turtlebot3/turtlebot3_slam/include
+Libs: -L${prefix}/lib 
+Requires: roscpp sensor_msgs

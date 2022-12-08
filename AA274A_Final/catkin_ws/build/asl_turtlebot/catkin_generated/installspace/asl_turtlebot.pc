@@ -1,0 +1,8 @@
+prefix=/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/install
+
+Name: asl_turtlebot
+Description: Description of asl_turtlebot
+Version: 0.0.0
+Cflags: -I${prefix}/include
+Libs: -L${prefix}/lib 
+Requires: 

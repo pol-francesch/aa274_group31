@@ -1,0 +1,8 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~k1" : \b [double] Pose Controller k1 min: 0.0, default: 0.8, max: 2.0
+- \b "~k2" : \b [double] Pose Controller k2 min: 0.0, default: 0.4, max: 2.0
+- \b "~k3" : \b [double] Pose Controller k3 min: 0.0, default: 0.4, max: 2.0
+

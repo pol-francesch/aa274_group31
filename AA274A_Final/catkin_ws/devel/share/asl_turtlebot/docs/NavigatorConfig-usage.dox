@@ -1,0 +1,9 @@
+\subsubsection usage Usage
+\verbatim
+<node name="navigator" pkg="asl_turtlebot" type="navigator">
+  <param name="k1" type="double" value="0.8" />
+  <param name="k2" type="double" value="0.4" />
+  <param name="k3" type="double" value="0.4" />
+</node>
+\endverbatim
+

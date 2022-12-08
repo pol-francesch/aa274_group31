@@ -1,0 +1,8 @@
+prefix=/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/devel
+
+Name: turtlebot3_msgs
+Description: Description of turtlebot3_msgs
+Version: 1.0.1
+Cflags: -I/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/devel/include
+Libs: -L${prefix}/lib 
+Requires: std_msgs message_runtime
