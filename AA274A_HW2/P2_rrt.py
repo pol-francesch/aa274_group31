@@ -308,3 +308,75 @@ class DubinsRRT(RRT):
             new_pts = d_path.sample_many(self.turning_radius*resolution)[0]
             pts.extend(new_pts)
         plt.plot([x for x, y, th in pts], [y for x, y, th in pts], **kwargs)
+
+class RRTStar(GeometricRRT):
+    """
+    Represents a geometric planning problem, where the steering solution
+    between two points is a straight line (Euclidean metric).
+
+    Using optimal RRT to find the path
+    """
+
+    def solve(self, eps, max_iters=1000, goal_bias=0.05, shortcut=False):
+        """
+        Constructs an RRT rooted at self.x_init with the aim of producing a
+        dynamically-feasible and obstacle-free trajectory from self.x_init
+        to self.x_goal.
+
+        Inputs:
+            eps: maximum steering distance
+            max_iters: maximum number of RRT iterations (early termination
+                is possible when a feasible solution is found)
+            goal_bias: probability during each iteration of setting
+                x_rand = self.x_goal (instead of uniformly randly sampling
+                from the state space)
+        Output:
+            None officially (just plots), but see the "Intermediate Outputs"
+            descriptions below
+        """
+        # Prep work
+        state_dim = len(self.x_init)
+
+        V = np.zeros((max_iters + 1, state_dim))
+        V[0,:] = self.x_init
+        n = 1 
+        P = -np.ones(max_iters + 1, dtype=int)
+
+        success = False
+
+        # RRT*
+        while n < max_iters:
+            if np.random.uniform(0.0, 1.0, None) < goal_bias:
+                x_rand = self.x_goal
+            else:
+                x_rand = np.zeros((state_dim,))
+                for i in range(0, state_dim):
+                    x_rand[i] = np.random.uniform(self.statespace_lo[i], self.statespace_hi[i], None)
+            
+            x_near = self.find_nearest(V[0:n, :], x_rand)
+            x_new  = self.steer_towards(x_near, x_rand, eps)
+            
+            if self.is_free_motion(self.obstacles, x_near, x_new):
+                V[n, :] = x_new
+                P[n] = np.where((V[0:n, :] == x_near).all(axis=1))[0][0]
+
+        # Back-generate path
+
+
+        # Plotting
+        plt.figure()
+        self.plot_problem()
+        self.plot_tree(V, P, color="blue", linewidth=.5, label="RRT tree", alpha=0.5)
+        if success:
+            if shortcut:
+                self.plot_path(color="purple", linewidth=2, label="Original solution path")
+                self.shortcut_path()
+                self.plot_path(color="green", linewidth=2, label="Shortcut solution path")
+            else:
+                self.plot_path(color="green", linewidth=2, label="Solution path")
+            plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.03), fancybox=True, ncol=3)
+            plt.scatter(V[:n,0], V[:n,1])
+        else:
+            print("Solution not found!")
+
+        return success
