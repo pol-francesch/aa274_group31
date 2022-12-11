@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 
 def line_line_intersection(l1, l2):
     """Checks whether or not two 2D line segments `l1` and `l2` intersect.
@@ -29,19 +30,16 @@ class RRTStar():
         Source: https://arxiv.org/pdf/1105.1186.pdf
     """
 
-    def __init__(self, statespace_lo, statespace_hi, x_init, x_goal, obstacles):
+    def __init__(self, statespace_lo, statespace_hi, x_init, x_goal, obstacles, free_motion_step=None):
         self.statespace_lo = np.array(statespace_lo)    # state space lower bound (e.g., [-5, -5])
         self.statespace_hi = np.array(statespace_hi)    # state space upper bound (e.g., [5, 5])
         self.x_init = np.array(x_init)                  # initial state
         self.x_goal = np.array(x_goal)                  # goal state
         self.path = None                                # the final path as a list of states
 
-        # We want compatability with both A* and RRT simulation
-        # So we just need to check the type of obstacle:
-        try:
-            self.obstacles = self.occupancy_grid_to_obs(obstacles)
-        except:
-            self.obstacles = obstacles
+        # Obstacles need to work on both RRT and A* maps
+        self.obstacles = obstacles
+        self.free_motion_step = free_motion_step
 
     def occupancy_grid_to_obs(self, occupancy):
         """
@@ -72,7 +70,6 @@ class RRTStar():
         maze += [edge1, edge2, edge3, edge4]
 
         return np.array(maze)
-
 
     def solve(self, eps=1.0, max_iters=1000, goal_bias=0.05, search_radius=2.0, plot=False):
         """
@@ -218,12 +215,25 @@ class RRTStar():
             x2: end state of motion
         Output:
             Boolean True/False
-        """     
-        motion = np.array([x1, x2])
-        for line in obstacles:
-            if line_line_intersection(motion, line):
-                return False
-        return True
+        """
+        if isinstance(obstacles, DetOccupancyGrid2D):
+            # Check along the line if there is an obstacle
+            # First create the points along the line
+            line = np.array([np.linspace(x1[0],x2[0],self.free_motion_step),
+                             np.linspace(x1[1],x2[1],self.free_motion_step)]).T
+
+            # Use built-in is_free function
+            for point in line:
+                if not obstacles.is_free(point):
+                    return False
+            
+            return True
+        else:
+            motion = np.array([x1, x2])
+            for line in obstacles:
+                if line_line_intersection(motion, line):
+                    return False
+            return True
 
     def find_nearby_states(self, V, x, obstacles, eps, search_radius):
         '''
@@ -339,6 +349,8 @@ class RRTStar():
         return np.array(path)
 
     def plot_problem(self):
+        if isinstance(self.obstacles, DetOccupancyGrid2D):
+            self.obstacles = self.occupancy_grid_to_obs(self.obstacles)
         plot_line_segments(self.obstacles, color="red", linewidth=2, label="obstacles")
         plt.scatter([self.x_init[0], self.x_goal[0]], [self.x_init[1], self.x_goal[1]], color="green", s=30, zorder=10)
         plt.annotate(r"$x_{init}$", self.x_init[:2] + [.2, 0], fontsize=16)
@@ -352,3 +364,37 @@ class RRTStar():
     def plot_path(self, **kwargs):
         path = np.array(self.path)
         plt.plot(path[:,0], path[:,1], **kwargs)
+
+class DetOccupancyGrid2D(object):
+    """
+    A 2D state space grid with a set of rectangular obstacles. The grid is
+    fully deterministic
+    """
+    def __init__(self, width, height, obstacles):
+        self.width = width
+        self.height = height
+        self.obstacles = obstacles
+
+    def is_free(self, x):
+        """Verifies that point is not inside any obstacles"""
+        for obs in self.obstacles:
+            inside = True
+            for dim in range(len(x)):
+                if x[dim] < obs[0][dim] or x[dim] > obs[1][dim]:
+                    inside = False
+                    break
+            if inside:
+                return False
+        return True
+
+    def plot(self, fig_num=0):
+        """Plots the space and its obstacles"""
+        fig = plt.figure(fig_num)
+        ax = fig.add_subplot(111, aspect='equal')
+        for obs in self.obstacles:
+            ax.add_patch(
+            patches.Rectangle(
+            obs[0],
+            obs[1][0]-obs[0][0],
+            obs[1][1]-obs[0][1],))
+        ax.set(xlim=(0,self.width), ylim=(0,self.height))
