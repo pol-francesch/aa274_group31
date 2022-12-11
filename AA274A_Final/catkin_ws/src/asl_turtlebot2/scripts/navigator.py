@@ -328,18 +328,18 @@ class Navigator:
             self.occupancy,
             self.plan_resolution,
         )
-        problem = RRTStar(
-            state_min,
-            state_max,
-            x_init,
-            x_goal,
-            self.occupancy,
-            self.plan_resolution
-        )
+        # problem = RRTStar(
+        #     state_min,
+        #     state_max,
+        #     x_init,
+        #     x_goal,
+        #     self.occupancy,
+        #     self.plan_resolution
+        # )
 
         rospy.loginfo("Navigator: computing navigation plan")
-        # success = problem.solve()
-        success = problem.solve(eps=3.0, max_iters=1000, goal_bias=0.05, search_radius=5.0, plot=True)
+        success = problem.solve()
+        # success = problem.solve(eps=3.0, max_iters=1000, goal_bias=0.05, search_radius=5.0, plot=True)
         if not success:
             rospy.loginfo("Planning failed")
             return
