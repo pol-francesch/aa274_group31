@@ -1,0 +1,21 @@
+<launch>
+  <arg name="sim" default="true"/>
+
+  <include file="$(find asl_turtlebot)/launch/root.launch">
+    <arg name="world" value="signs" />
+    <arg name="x_pos" default="3.15"/>
+    <arg name="y_pos" default="1.6"/>
+    <arg name="z_pos" default="0.0"/>
+    <arg name="rviz" default="section4"/>
+    <arg name="model" default="asl_turtlebot"/>
+    <arg name="sim" default="$(arg sim)"/>
+  </include>
+
+  <node pkg="asl_turtlebot" type="supervisor.py" name="supervisor" output="screen" />
+
+  <!-- <node pkg="asl_turtlebot" type="multiplexer.py" name="multiplexer" output="screen">
+    <param name="teleop" value="False" />
+  </node> -->
+
+  <!-- <include file="$(find turtlebot3_teleop)/launch/turtlebot3_teleop_key.launch"/> -->
+</launch>
