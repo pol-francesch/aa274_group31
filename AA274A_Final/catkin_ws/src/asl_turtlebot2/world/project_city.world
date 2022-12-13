@@ -1015,41 +1015,6 @@
       <pose frame=''>3.35 1.4 0.01 0.0 0.0 3.14159</pose>
     </model>
 
-    <actor name="actor">
-      <skin>
-        <filename>walk.dae</filename>
-        <scale>0.25</scale>
-      </skin>
-      <animation name="animation">
-        <filename>walk.dae</filename>
-        <interpolate_x>true</interpolate_x>
-        <scale>0.25</scale>
-      </animation>
-      <script>
-        <trajectory id="0" type="walking">
-          <waypoint>
-            <time>0</time>
-            <pose>0 2 0.25 0 0 -1.57</pose>
-          </waypoint>
-          <waypoint>
-            <time>2</time>
-            <pose>0 -2 0.25 0 0 -1.57</pose>
-          </waypoint>
-          <waypoint>
-            <time>2.5</time>
-            <pose>0 -2 0.25 0 0 1.57</pose>
-          </waypoint>
-          <waypoint>
-            <time>7</time>
-            <pose>0 2 0.25 0 0 1.57</pose>
-          </waypoint>
-          <waypoint>
-            <time>7.5</time>
-            <pose>0 2 0.25 0 0 -1.57</pose>
-          </waypoint>
-        </trajectory>
-      </script>
-    </actor>
 
 
 

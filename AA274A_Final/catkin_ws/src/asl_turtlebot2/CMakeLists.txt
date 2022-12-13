@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(asl_turtlebot)
+project(asl_turtlebot2)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -50,6 +50,7 @@ add_message_files(
  FILES
  DetectedObject.msg
  DetectedObjectList.msg
+ FRS.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -70,6 +71,7 @@ add_message_files(
 generate_messages(
  DEPENDENCIES
  std_msgs
+ geometry_msgs
 )
 
 ################################################
