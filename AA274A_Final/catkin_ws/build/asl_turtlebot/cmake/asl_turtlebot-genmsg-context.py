@@ -1,6 +1,6 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
-messages_str = "/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg/DetectedObject.msg;/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg/DetectedObjectList.msg"
+messages_str = "/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg/DetectedObject.msg;/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg/DetectedObjectList.msg;/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg/FRS.msg"
 services_str = ""
 pkg_name = "asl_turtlebot"
 dependencies_str = "std_msgs"

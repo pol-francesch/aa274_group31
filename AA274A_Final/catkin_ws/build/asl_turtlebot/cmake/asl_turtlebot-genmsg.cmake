@@ -1,6 +1,8 @@
 # generated from genmsg/cmake/pkg-genmsg.cmake.em
 
-message(STATUS "asl_turtlebot: 2 messages, 0 services")
+message(FATAL_ERROR "Could not find messages which '/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg/FRS.msg' depends on. Did you forget to specify generate_messages(DEPENDENCIES ...)?
+Cannot locate message [Polygon] in package [asl_turtlebot] with paths [['/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg']]")
+message(STATUS "asl_turtlebot: 3 messages, 0 services")
 
 set(MSG_I_FLAGS "-Iasl_turtlebot:/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/asl_turtlebot/msg;-Istd_msgs:/opt/ros/noetic/share/std_msgs/cmake/../msg")
 

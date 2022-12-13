@@ -928,7 +928,7 @@ interactive_markers_DIR:PATH=/opt/ros/noetic/share/interactive_markers/cmake
 jsoncpp_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/jsoncpp
 
 //Path to a library.
-lib:FILEPATH=/opt/ros/noetic/lib/libxmlrpcpp.so
+lib:FILEPATH=/opt/ros/noetic/lib/libdynamic_reconfigure_config_init_mutex.so
 
 //The directory containing a CMake configuration file for message_filters.
 message_filters_DIR:PATH=/opt/ros/noetic/share/message_filters/cmake
@@ -1104,8 +1104,7 @@ turtlebot3_gazebo_SOURCE_DIR:STATIC=/home/group38/Documents/aa274_group31/AA274A
 //Value Computed by CMake
 turtlebot3_msgs_BINARY_DIR:STATIC=/data/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/build/turtlebot3_msgs
 
-//The directory containing a CMake configuration file for turtlebot3_msgs.
-turtlebot3_msgs_DIR:PATH=/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/devel/share/turtlebot3_msgs/cmake
+turtlebot3_msgs_DIR:PATH=
 
 //Value Computed by CMake
 turtlebot3_msgs_SOURCE_DIR:STATIC=/home/group38/Documents/aa274_group31/AA274A_Final/catkin_ws/src/turtlebot3_msgs
@@ -1334,7 +1333,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=16
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=9
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
